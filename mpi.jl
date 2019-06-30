@@ -28,9 +28,6 @@ function mpi_basic!(c, A, b, x, y, z, σ = .2)
 
         solved = (dot(x,z) < 1e-5)
         tired = (iter > 1e3)
-        if tired || solved
-          println("$iter")
-        end
     end
     return x, y, z
 end
@@ -86,9 +83,6 @@ function mpi_mehrotra!(c, A, b, x, y, z)
 
         solved = (dot(x,z) < 1e-4)
         tired = (iter > 1e3)
-        if tired || solved
-          println("$iter")
-        end
     end
     return x, y, z
 end
