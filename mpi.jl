@@ -26,8 +26,8 @@ function mpi_basic!(c, A, b, x, y, z, σ = .2)
         z += α*dz
         iter += 1
 
-        solved = (dot(x,z) < 1e-5)
-        tired = (iter > 1e3)
+        solved = dot(x,z) < 1e-5
+        tired = iter > 1e3
     end
     return x, y, z
 end
@@ -44,7 +44,7 @@ function mpi_mehrotra!(c, A, b, x, y, z)
 
     	μ = dot(x,z)/n
 
-    	# predictive phase
+       # predictive phase
 
     	F = lu(A*(x.*z.^(-1).*A'))
 
@@ -57,13 +57,13 @@ function mpi_mehrotra!(c, A, b, x, y, z)
           if (dxaff[i] < 0 && -x[i]/dxaff[i] < αaff) αaff = -x[i]/dxaff[i] end
           if (dzaff[i] < 0 && -z[i]/dzaff[i] < αaff) αaff = -z[i]/dzaff[i] end
         end
-        αaff = 0.9*αaff
+        αaff *= 0.9
 
-		μaff = dot(x + αaff*dxaff , z + αaff*dzaff)/n
+        μaff = dot(x + αaff*dxaff , z + αaff*dzaff)/n
 
-		σ = (μaff/μ)^3
+        σ = (μaff/μ)^3
 
-		# corrective phase
+        # corrective phase
 
         dy .= F\(A*(x - σ*μ*z.^(-1) + z.^(-1).*dxaff.*dzaff))
         dz .= -A'*dy
@@ -74,15 +74,15 @@ function mpi_mehrotra!(c, A, b, x, y, z)
           if (dx[i] < 0 && -x[i]/dx[i] < α) α = -x[i]/dx[i] end
           if (dz[i] < 0 && -z[i]/dz[i] < α) α = -z[i]/dz[i] end
         end
-        α = 0.9*α
+        α *= 0.9
 
         x += α*dx
         y += α*dy
         z += α*dz
         iter += 1
 
-        solved = (dot(x,z) < 1e-4)
-        tired = (iter > 1e3)
+        solved = dot(x,z) < 1e-4
+        tired = iter > 1e3
     end
     return x, y, z
 end
